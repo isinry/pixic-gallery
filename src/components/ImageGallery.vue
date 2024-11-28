@@ -48,7 +48,7 @@
             @click="layout = 'grid'"
           >
             <i class="fas fa-grip-horizontal"></i>
-            网格
+            单列
           </button>
         </div>
       </div>
@@ -129,7 +129,7 @@
           class="image-card"
           @click="openLightbox(image)"
         >
-          <div class="image-wrapper">
+          <div class="image-wrapper" :style="getImageStyle(image)">
             <img 
               :src="getThumbnailUrl(image.urlsList)"
               :alt="image.title"
@@ -653,6 +653,10 @@ header {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
+  width: 100%;
+}
+.gallery.grid image-wrapper {
+    height: auto;
 }
 
 /* 瀑布流布局 */
