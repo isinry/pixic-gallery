@@ -1,6 +1,7 @@
-# my-gallery
+# PIXIV图库
 
-This template should help get you started developing with Vue 3 in Vite.
+页面由莫西鸭接口进行开发，文档地址：
+https://docs.mossia.top/
 
 ## Recommended IDE Setup
 
