@@ -11,7 +11,7 @@ https://docs.mossia.top/
 
 See [Vite Configuration Reference](https://vite.dev/config/).
 
-## Project Setup
+## 安装
 
 ```sh
 npm install
@@ -28,3 +28,7 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## 效果图
+![图库效果图](p0.png)
+![图库效果图](p1.png)
