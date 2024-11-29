@@ -1,0 +1,11 @@
+{
+	"main": "index.html",
+	"logo": "logo.jpg",
+	"features": [
+		{
+		  "code": "每日美图",
+		  "explain": "img",
+			"cmds":["img", "image","图片","图库"]
+		}
+	]
+}

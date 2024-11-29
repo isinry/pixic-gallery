@@ -160,7 +160,7 @@
       <div class="lightbox-content" @click.stop>
         <div class="lightbox-scroll">
           <img 
-            :src="selectedImage.urlsList[0].url" 
+            :src="getThumbnailUrl(selectedImage.urlsList, false)" 
             :alt="selectedImage.title"
             @load="onLightboxImageLoad"
           >
@@ -200,7 +200,7 @@ const renderInterval = ref(null)
 const images = ref([])
 const loading = ref(false)
 const error = ref(null)
-const layout = ref('masonry')
+const layout = ref('grid')
 const selectedImage = ref(null)
 
 // 修改列数控制
@@ -229,7 +229,7 @@ const fetchImages = async (isLoadMore = false) => {
     page.value = 1
     loadedImages.value = 0
     renderedCount.value = 0
-    loadedImageMap.value = {} // 重置加载状态映射
+    loadedImageMap.value = {}
   } else {
     loadingMore.value = true
   }
@@ -244,9 +244,16 @@ const fetchImages = async (isLoadMore = false) => {
         num: 10,
         author: searchAuthor.value || undefined,
         r18Type: r18Type.value,
-        sizeList: ['original', 'regular']
+        sizeList: ['original', 'regular', 'small']
       })
     })
+
+    // 检查状态码
+    if (response.status === 429) {
+      error.value = '请求太过频繁，请一个小时后再试'
+      return
+    }
+
     const data = await response.json()
     if (data.success) {
       if (isLoadMore) {
@@ -257,7 +264,7 @@ const fetchImages = async (isLoadMore = false) => {
       hasMore.value = data.data.length === 10
       startRendering()
     } else {
-      error.value = data.message || 'Failed to fetch images'
+      error.value = data.message || '获取图片失败'
     }
   } catch (err) {
     error.value = err.message
@@ -297,13 +304,14 @@ const closeLightbox = () => {
 }
 
 // 获取缩略图链接
-const getThumbnailUrl = (itemImages) => {
+const getThumbnailUrl = (itemImages, isThumbnail=true) => {
   // 如果有regular尺寸,优先使用regular作为缩略图
-  const regularUrl = itemImages.find(url => url.urlSize === 'regular')?.url
-  if (regularUrl) return regularUrl
+  const regularUrl = itemImages.find(url => url.urlSize === 'small')?.url
+  if (isThumbnail && regularUrl) return regularUrl
   
   // 否则使用原图
-  return itemImages[0]?.url
+  const originalUrl = itemImages.find(url => url.urlSize === 'original')?.url
+  return originalUrl
 }
 
 // 新增加载更多方法
@@ -321,13 +329,20 @@ const loadMore = async () => {
       },
       body: JSON.stringify({ 
         num: 5,
-        sizeList: ['original', 'regular']
+        author: searchAuthor.value || undefined,
+        r18Type: r18Type.value,
+        sizeList: ['original', 'regular', 'small']
       })
     })
-    const data = await response.json()
+
+    // 检查状态码
+    if (response.status === 429) {
+      error.value = '请求太过频繁，请一个小时后再试'
+      return
+    }
     
+    const data = await response.json()
     if (data.success) {
-      // 等待一小段时间，让占位符动画完成
       await new Promise(resolve => setTimeout(resolve, 300))
       images.value = [...images.value, ...data.data]
       hasMore.value = data.data.length === 5
@@ -1173,6 +1188,17 @@ header {
   transition: transform 0.3s ease;
 }
 
+/* 错误提示样式优化 */
+.error-message {
+  text-align: center;
+  padding: 20px;
+  margin: 20px 0;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  color: #dc3545;
+  font-size: 16px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
 
 </style>
 
